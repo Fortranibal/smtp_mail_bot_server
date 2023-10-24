@@ -4,18 +4,20 @@ from email import message_from_bytes
 
 class MailHandler:
     async def handle_RCPT(self, server, session, envelope, address, rcpt_options):
+        # RECIEVER CHECK:
         # This part checks whether the mail coming in is actually
-        # coming in to where it should, as in kianbrose.com which
-        # is my domain. Technically not fully necessary but nice
-        # to have.
-        if not address.endswith('@kianbrose.com'):
-            print("Address does not end with @kianbrose.com")
+        # coming in to where it should, as in anibalguerrero.com 
+        # (which is my domain). 
+        # Technically, not fully necessary but nice to have.
+        if not address.endswith('@anibalguerrero.com'):
+            print("Address does not end with @anibalguerrero.com")
             return '550 not relaying to that domain'
         envelope.rcpt_tos.append(address)
         return '250 OK'
     async def handle_DATA(self, server, session, envelope):
-        # This one if the sender, so if it was sent to
-        # someone@gmail.com mail_from will be that
+        # SENDER CHECK:
+        # This part checks who the sender is.
+        # If it was sent to mail_from = "someone@gmail.com"
         print('Message from %s' % envelope.mail_from)
 
         # This is a string array of who it was sent to
@@ -32,7 +34,7 @@ class MailHandler:
 
 
         # This code is to just read the text part of the email
-        # in other words the useful part that we actually, as in
+        # In other words the useful part that we actually, as in
         # the actual text inside the mail
         plain_text_part = None
         email_message = message_from_bytes(envelope.content)
@@ -47,13 +49,13 @@ class MailHandler:
 
 
         # This is to finish the mail and see that it finished
-        # it can be removed, just visual
+        # (It can be removed, just visual)
         print()
         print('End of message')
         return '250 Message accepted for delivery'
 
 # Here you start the actual server, hostname is your PRIVATE ipv4, and port has to be 25
 # Change it to your actual local ipv4 or use localhost
-controller = Controller(MailHandler(), hostname='192.168.10.10', port=25)
+controller = Controller(MailHandler(), hostname='192.168.0.204', port=25)
 controller.start()
 asyncio.get_event_loop().run_forever()
